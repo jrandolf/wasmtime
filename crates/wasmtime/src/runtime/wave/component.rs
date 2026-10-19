@@ -4,7 +4,7 @@ use std::borrow::Cow;
 
 use super::{canonicalize_nan32, canonicalize_nan64, unwrap_2val, unwrap_val};
 use component::wasm_wave::wasm::{
-    DisplayValue, WasmFunc, WasmType, WasmTypeKind, WasmValue, WasmValueError, ensure_type_kind,
+    WasmFunc, WasmType, WasmTypeKind, WasmValue, WasmValueError, ensure_type_kind,
 };
 
 macro_rules! maybe_unwrap_type {
@@ -299,6 +299,32 @@ impl WasmValue for component::Val {
     }
 }
 
+/// Returns an error if `val`, or any value nested within it, is of a type that
+/// WAVE can't represent yet (i.e. one whose `kind` above is
+/// `WasmTypeKind::Unsupported`, such as `map`s and resources).
+///
+/// wasm-wave's writer panics on such values (as of 0.262) and couldn't say
+/// which type was the problem anyway, so this is checked before handing a
+/// value to it.
+pub(crate) fn ensure_wave_supported(val: &component::Val) -> Result<()> {
+    use component::Val;
+    match val {
+        Val::List(vals) | Val::FixedLengthList(vals) | Val::Tuple(vals) => {
+            vals.iter().try_for_each(ensure_wave_supported)
+        }
+        Val::Record(fields) => fields
+            .iter()
+            .try_for_each(|(_, val)| ensure_wave_supported(val)),
+        Val::Variant(_, Some(val))
+        | Val::Option(Some(val))
+        | Val::Result(Ok(Some(val)) | Err(Some(val))) => ensure_wave_supported(val),
+        _ if val.kind() == WasmTypeKind::Unsupported => {
+            bail!("cannot render `{}` values as WAVE yet", val.desc())
+        }
+        _ => Ok(()),
+    }
+}
+
 // Returns an error if the given component::Val is not of the given component::Type.
 //
 // The component::Val::Resource(_) variant results in an unsupported error at this time.
@@ -306,7 +332,7 @@ fn ensure_type_val(ty: &component::Type, val: &component::Val) -> Result<(), Was
     let wrong_value_type = || -> Result<(), WasmValueError> {
         Err(WasmValueError::WrongValueType {
             ty: wasm_wave::wasm::DisplayType(ty).to_string(),
-            val: wasm_wave::wasm::DisplayValue(val).to_string(),
+            val: val.to_wave().unwrap_or_else(|_| format!("{val:?}")),
         })
     };
 
@@ -394,9 +420,7 @@ fn ensure_type_val(ty: &component::Type, val: &component::Val) -> Result<(), Was
             }
         }
         component::Val::Resource(_) => {
-            return Err(WasmValueError::UnsupportedType(
-                DisplayValue(val).to_string(),
-            ));
+            return Err(WasmValueError::UnsupportedType(val.desc().to_string()));
         }
 
         // Any leaf variant type has already had its kind compared above; nothing further to check.
@@ -460,6 +484,26 @@ mod tests {
                 .unwrap_or_else(|err| panic!("failed to serialize {val:?}: {err}"));
             assert_eq!(got, want, "for {val:?}");
         }
+    }
+
+    #[test]
+    fn unsupported_vals_are_errors() {
+        use crate::component::Val;
+        use crate::prelude::*;
+
+        let err = Val::Map(vec![]).to_wave().unwrap_err();
+        assert_eq!(err.to_string(), "cannot render `map` values as WAVE yet");
+
+        let nested = Val::List(vec![Val::Option(Some(Box::new(Val::Map(vec![(
+            Val::U32(1),
+            Val::U32(2),
+        )]))))]);
+        let err = nested.to_wave().unwrap_err();
+        assert_eq!(err.to_string(), "cannot render `map` values as WAVE yet");
+
+        // Only values are checked, so e.g. a `none` of type `option<map<..>>`
+        // still renders.
+        assert_eq!(Val::Option(None).to_wave().unwrap(), "none");
     }
 
     #[test]

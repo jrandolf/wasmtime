@@ -2,6 +2,8 @@
 
 #[cfg(feature = "component-model")]
 mod component;
+#[cfg(feature = "component-model")]
+pub(crate) use component::ensure_wave_supported;
 mod core;
 
 macro_rules! unwrap_val {

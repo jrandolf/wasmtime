@@ -795,8 +795,13 @@ impl Val {
     }
 
     /// Serialize a [`Val`] to its [`crate::component::wasm_wave`] encoding.
+    ///
+    /// Returns an error if this value, or any value nested within it, can't be
+    /// represented in WAVE, such as `map`s, resources, futures, streams, and
+    /// error contexts.
     #[cfg(feature = "wave")]
     pub fn to_wave(&self) -> Result<String> {
+        crate::runtime::wave::ensure_wave_supported(self)?;
         Ok(wasm_wave::to_string(self)?)
     }
 }
