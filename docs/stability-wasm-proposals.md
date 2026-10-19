@@ -129,12 +129,12 @@ implementations within Wasmtime.
 |---------------------------|-------|---------|-------|----------|--------|-----|--------|
 | async                     | 🔀    | ✅      | ✅    | ✅       | ✅     | ✅  | 🚧[^c1]|
 | map                       | 🗺️     | ✅      | ✅    | ✅       | ✅     | ✅  | ✅     |
+| implements                | 🏷️     | ✅      | ✅    | ✅       | ✅     | ✅  | ✅     |
 
 **Off-by-default proposals**
 
 |  Proposal                 | Emoji | Phase 4 | Tests | Finished | Fuzzed | API | C API  |
 |---------------------------|-------|---------|-------|----------|--------|-----|--------|
-| implements                | 🏷️     | ✅      | ✅    | ✅       | ❌     | ✅  | ✅     |
 | more async options [^c2]  | 🚝    | ❌      | ✅    | ❌       | ❌     | ✅  | ✅     |
 | stackful async [^c2]      | 🚟    | ❌      | ✅    | ❌       | ❌     | ✅  | ✅     |
 | threading                 | 🧵    | ❌      | ✅    | ❌       | ❌     | ✅  | ❌     |
