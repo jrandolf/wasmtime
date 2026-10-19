@@ -4285,3 +4285,38 @@ fn map_trampoline_alignment_u64_u8() -> Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn typed_map_lift_out_of_bounds() -> Result<()> {
+    // A guest-controlled length that doesn't fit in linear memory should be
+    // rejected before the host allocates anything based on it.
+    let component = r#"
+(component
+    (core module $m
+        (memory (export "memory") 1)
+        (func (export "f") (result i32)
+            (i32.store (i32.const 32) (i32.const 0))
+            (i32.store (i32.const 36) (i32.const -1))
+            i32.const 32)
+        (func (export "realloc") (param i32 i32 i32 i32) (result i32) unreachable)
+    )
+    (core instance $i (instantiate $m))
+    (func (export "f") (result (map u32 u32))
+        (canon lift (core func $i "f") (memory (core memory $i "memory"))
+            (realloc (core func $i "realloc"))))
+)
+"#;
+
+    let engine = super::map_engine();
+    let component = Component::new(&engine, component)?;
+    let mut store = Store::new(&engine, ());
+    let instance = Linker::new(&engine).instantiate(&mut store, &component)?;
+    let f =
+        instance.get_typed_func::<(), (std::collections::HashMap<u32, u32>,)>(&mut store, "f")?;
+    let err = f.call(&mut store, ()).unwrap_err();
+    assert!(
+        format!("{err:?}").contains("map pointer/length out of bounds of memory"),
+        "{err:?}"
+    );
+    Ok(())
+}
