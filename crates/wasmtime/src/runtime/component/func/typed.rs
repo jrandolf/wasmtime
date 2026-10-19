@@ -2150,8 +2150,6 @@ where
     K: Lift + Eq + Hash,
     V: Lift,
 {
-    let mut result = TryHashMap::with_capacity(len)?;
-
     match len
         .checked_mul(usize::try_from(map.entry_abi.size32)?)
         .and_then(|total| ptr.checked_add(total))
@@ -2163,6 +2161,9 @@ where
         bail!("map pointer is not aligned");
     }
 
+    // Only allocate once `len` has been validated against linear memory, since
+    // it's otherwise an arbitrary guest-controlled value.
+    let mut result = TryHashMap::with_capacity(len)?;
     for i in 0..len {
         let entry_base = ptr + (i * usize::try_from(map.entry_abi.size32)?);
 
