@@ -17,7 +17,7 @@ mod wasi;
 // Ensure that `bindgen!` output for `map<K, V>` compiles without Wasmtime's
 // `std` feature.
 #[cfg(feature = "wasi")]
-#[allow(dead_code)]
+#[allow(dead_code, reason = "only checks that the generated code compiles")]
 mod map_bindgen {
     wasmtime::component::bindgen!({
         inline: "
