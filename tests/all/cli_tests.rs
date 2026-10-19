@@ -688,6 +688,30 @@ fn component_invoke_multiple_run_exports() -> Result<()> {
 
 #[test]
 #[cfg_attr(not(feature = "component-model"), ignore)]
+fn component_invoke_wave_unsupported_result() -> Result<()> {
+    // WAVE can't represent `map` values yet, so printing the result of this
+    // call should fail with an error rather than a panic (#14811).
+    let output = get_wasmtime_command()?
+        .args(&[
+            "run",
+            "-Wcomponent-model-map",
+            "--invoke",
+            "f()",
+            "tests/all/cli_tests/component-map-result.wat",
+        ])
+        .output()?;
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert_eq!(output.status.code(), Some(1), "bad stderr: {stderr}");
+    assert!(
+        stderr.contains("cannot render `map` values as WAVE yet"),
+        "bad stderr: {stderr}"
+    );
+    assert!(!stderr.contains("panicked"), "bad stderr: {stderr}");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(not(feature = "component-model"), ignore)]
 fn component_unknown_imports_default() -> Result<()> {
     let path = "tests/all/cli_tests/component-unknown-imports.wat";
 
