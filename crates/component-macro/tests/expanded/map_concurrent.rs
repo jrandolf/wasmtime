@@ -1061,7 +1061,12 @@ pub mod exports {
                             .func();
                         let bytes_roundtrip = *_instance
                             .get_typed_func::<
-                                (wasmtime::component::__internal::HashMap<&str, &[u8]>,),
+                                (
+                                    &wasmtime::component::__internal::HashMap<
+                                        wasmtime::component::__internal::String,
+                                        wasmtime::component::__internal::Vec<u8>,
+                                    >,
+                                ),
                                 (
                                     wasmtime::component::__internal::HashMap<
                                         wasmtime::component::__internal::String,
@@ -1073,7 +1078,12 @@ pub mod exports {
                         let option_roundtrip = *_instance
                             .get_typed_func::<
                                 (
-                                    Option<wasmtime::component::__internal::HashMap<&str, u32>>,
+                                    Option<
+                                        &wasmtime::component::__internal::HashMap<
+                                            wasmtime::component::__internal::String,
+                                            u32,
+                                        >,
+                                    >,
                                 ),
                                 (
                                     Option<
@@ -1089,7 +1099,10 @@ pub mod exports {
                             .get_typed_func::<
                                 (
                                     Result<
-                                        wasmtime::component::__internal::HashMap<u32, &str>,
+                                        &wasmtime::component::__internal::HashMap<
+                                            u32,
+                                            wasmtime::component::__internal::String,
+                                        >,
                                         &str,
                                     >,
                                 ),
@@ -1107,7 +1120,13 @@ pub mod exports {
                         let tuple_roundtrip = *_instance
                             .get_typed_func::<
                                 (
-                                    (wasmtime::component::__internal::HashMap<&str, u32>, u64),
+                                    (
+                                        &wasmtime::component::__internal::HashMap<
+                                            wasmtime::component::__internal::String,
+                                            u32,
+                                        >,
+                                        u64,
+                                    ),
                                 ),
                                 (
                                     (
@@ -1123,9 +1142,12 @@ pub mod exports {
                         let nested_roundtrip = *_instance
                             .get_typed_func::<
                                 (
-                                    wasmtime::component::__internal::HashMap<
-                                        &str,
-                                        wasmtime::component::__internal::HashMap<u32, &str>,
+                                    &wasmtime::component::__internal::HashMap<
+                                        wasmtime::component::__internal::String,
+                                        wasmtime::component::__internal::HashMap<
+                                            u32,
+                                            wasmtime::component::__internal::String,
+                                        >,
                                     >,
                                 ),
                                 (
@@ -1172,17 +1194,20 @@ pub mod exports {
                         let all_key_types = *_instance
                             .get_typed_func::<
                                 (
-                                    wasmtime::component::__internal::HashMap<bool, u32>,
-                                    wasmtime::component::__internal::HashMap<u8, u32>,
-                                    wasmtime::component::__internal::HashMap<i8, u32>,
-                                    wasmtime::component::__internal::HashMap<u16, u32>,
-                                    wasmtime::component::__internal::HashMap<i16, u32>,
-                                    wasmtime::component::__internal::HashMap<u32, u32>,
-                                    wasmtime::component::__internal::HashMap<i32, u32>,
-                                    wasmtime::component::__internal::HashMap<u64, u32>,
-                                    wasmtime::component::__internal::HashMap<i64, u32>,
-                                    wasmtime::component::__internal::HashMap<char, u32>,
-                                    wasmtime::component::__internal::HashMap<&str, u32>,
+                                    &wasmtime::component::__internal::HashMap<bool, u32>,
+                                    &wasmtime::component::__internal::HashMap<u8, u32>,
+                                    &wasmtime::component::__internal::HashMap<i8, u32>,
+                                    &wasmtime::component::__internal::HashMap<u16, u32>,
+                                    &wasmtime::component::__internal::HashMap<i16, u32>,
+                                    &wasmtime::component::__internal::HashMap<u32, u32>,
+                                    &wasmtime::component::__internal::HashMap<i32, u32>,
+                                    &wasmtime::component::__internal::HashMap<u64, u32>,
+                                    &wasmtime::component::__internal::HashMap<i64, u32>,
+                                    &wasmtime::component::__internal::HashMap<char, u32>,
+                                    &wasmtime::component::__internal::HashMap<
+                                        wasmtime::component::__internal::String,
+                                        u32,
+                                    >,
                                 ),
                                 (),
                             >(&mut store, &self.all_key_types)?
@@ -1190,8 +1215,8 @@ pub mod exports {
                         let own_values = *_instance
                             .get_typed_func::<
                                 (
-                                    wasmtime::component::__internal::HashMap<
-                                        &str,
+                                    &wasmtime::component::__internal::HashMap<
+                                        wasmtime::component::__internal::String,
                                         wasmtime::component::ResourceAny,
                                     >,
                                 ),
@@ -1206,8 +1231,8 @@ pub mod exports {
                         let borrowed_values = *_instance
                             .get_typed_func::<
                                 (
-                                    wasmtime::component::__internal::HashMap<
-                                        &str,
+                                    &wasmtime::component::__internal::HashMap<
+                                        wasmtime::component::__internal::String,
                                         wasmtime::component::ResourceAny,
                                     >,
                                 ),
