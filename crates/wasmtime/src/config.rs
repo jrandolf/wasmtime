@@ -1382,8 +1382,9 @@ impl Config {
 
     /// Configures whether the component model map type is enabled or not.
     ///
-    /// This is part of the component model specification and enables the
-    /// `map<k, v>` type in WIT and the component binary format.
+    /// This corresponds to the 🗺️ emoji in the component model specification
+    /// and enables the `map<k, v>` type in WIT and the component binary
+    /// format.
     ///
     /// The default value for this option is whether the `component-model`
     /// crate feature of Wasmtime is enabled or not. By default this crate
